@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    android:focusable="true"
+    android:orientation="horizontal">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/sortAlphaCardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="100dp"
+        app:cardElevation="1dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/sortAlphaImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_sort_alpha_asc" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/sortNumericCardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="100dp"
+        app:cardElevation="1dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/sortNumericImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_sort_numeric_asc" />
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

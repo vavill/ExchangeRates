@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/root"
+    android:layout_height="wrap_content"
+    android:theme="@style/ItemCurrencyStyle">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/flagImageView"
+            android:layout_width="45dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/currencyNameTextView"
+            style="@style/ItemCurrencyName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@id/flagImageView"
+            app:layout_constraintTop_toTopOf="@id/flagImageView"
+            tools:text="ABC" />
+
+        <TextView
+            android:id="@+id/currencyFullNameTextView"
+            style="@style/ItemCurrencyFullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/flagImageView"
+            app:layout_constraintStart_toStartOf="@id/currencyNameTextView"
+            app:layout_constraintTop_toBottomOf="@id/currencyNameTextView"
+            tools:text="Aaaa Bb Ccccccc" />
+
+        <TextView
+            android:id="@+id/currencyValueTextView"
+            style="@style/ItemCurrencyValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintBottom_toBottomOf="@id/flagImageView"
+            app:layout_constraintEnd_toStartOf="@id/currencyFavouriteImageView"
+            app:layout_constraintTop_toTopOf="@id/flagImageView"
+            tools:text="1,00" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/currencyFavouriteImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_favourite_true"
+            app:layout_constraintBottom_toBottomOf="@id/currencyValueTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/currencyValueTextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

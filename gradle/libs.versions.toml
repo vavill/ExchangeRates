@@ -1,0 +1,62 @@
+[versions]
+agp = "8.4.1"
+coil = "2.6.0"
+datastorePreferences = "1.1.1"
+glide = "4.16.0"
+kotlin = "1.9.0"
+coreKtx = "1.13.1"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+appcompat = "1.7.0"
+loadingviewlib = "1.0"
+material = "1.12.0"
+activity = "1.9.0"
+constraintlayout = "2.1.4"
+fragmentKtx = "1.7.1"
+hiltPlugin = "HEAD-SNAPSHOT"
+ksp = "1.9.21-1.0.15"
+hiltAndroid = "HEAD-SNAPSHOT"
+hiltCompiler = "2.51.1"
+kotlinxCoroutinesAndroid = "1.8.0"
+loggingInterceptor = "5.0.0-alpha.2"
+retrofitVersion = "2.9.0"
+roomRuntime = "2.6.1"
+coroutines = "1.8.0"
+shimmerlayout = "1.1"
+swiperefreshlayout = "1.1.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+loadingviewlib = { module = "com.ldoublem.loadingview:loadingviewlib", version.ref = "loadingviewlib" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroid" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofitVersion" }
+retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
+shimmerlayout = { module = "xyz.peridy.shimmer:shimmerlayout", version.ref = "shimmerlayout" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltPlugin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

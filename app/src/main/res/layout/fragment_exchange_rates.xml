@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragment.ExchangeRatesFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/currentCurrencyCardView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintEnd_toStartOf="@+id/sortButtonCardView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rippleColor="@android:color/transparent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/currentCurrencyImageImageView"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:scaleType="fitXY"
+                app:layout_constraintBottom_toTopOf="@id/searchView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/currentCurrencyNameTextView"
+                style="@style/ItemCurrencyName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                tools:text="RUB"
+                app:layout_constraintBottom_toTopOf="@+id/currentCurrencyFullNameTextView"
+                app:layout_constraintStart_toEndOf="@id/currentCurrencyImageImageView"
+                app:layout_constraintTop_toTopOf="@+id/currentCurrencyImageImageView" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/currentCurrencyFullNameTextView"
+                style="@style/ItemCurrencyFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:maxLength="26"
+                tools:text="Russian Rubble"
+                app:layout_constraintBottom_toBottomOf="@+id/currentCurrencyImageImageView"
+                app:layout_constraintStart_toEndOf="@id/currentCurrencyImageImageView" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/currentCurrencyArrowImageView"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_drop_down_arrow_closed"
+                app:layout_constraintBottom_toBottomOf="@id/currentCurrencyImageImageView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/currentCurrencyImageImageView" />
+
+            <SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginTop="5dp"
+                android:iconifiedByDefault="false"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/sortButtonCardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/currentCurrencyCardView"
+        app:strokeColor="@color/white">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/sortButtonImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_sort" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:layout_marginHorizontal="50dp"
+        android:backgroundTint="#B6B6B6"
+        app:layout_constraintBottom_toTopOf="@id/containerFragment"
+        app:layout_constraintTop_toBottomOf="@id/currentCurrencyCardView" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/containerFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="80dp"
+        app:cardCornerRadius="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/navBottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/currentCurrencyCardView" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/containerFragment"
+        app:layout_constraintTop_toTopOf="@id/containerFragment" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navBottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:clickable="false"
+        app:itemActiveIndicatorStyle="@android:color/transparent"
+        app:itemHorizontalTranslationEnabled="false"
+        app:itemIconSize="30dp"
+        app:itemRippleColor="@android:color/transparent"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
