@@ -6,13 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.vavill.exchangerates.collectWithLifecycle
 import com.vavill.exchangerates.databinding.FragmentFavouritesBinding
+import com.vavill.exchangerates.domain.model.ExchangeRatesModel
 import com.vavill.exchangerates.ui.adapter.FavouritesAdapter
+import com.vavill.exchangerates.ui.adapter.OnClickListenerFavourites
 import com.vavill.exchangerates.ui.viewmodel.ExchangeRatesViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FavouritesFragment : Fragment() {
+class FavouritesFragment : Fragment(), OnClickListenerFavourites {
 
     companion object {
         fun newInstance() = FavouritesFragment()
@@ -44,13 +53,13 @@ class FavouritesFragment : Fragment() {
     }
 
     private fun init() {
-        adapterRV = FavouritesAdapter(viewModel)
+        adapterRV = FavouritesAdapter(this)
         binding.favouritesRecyclerView.adapter = adapterRV
         viewModel.getFavouriteCurrencies()
 
-        viewModel.favouriteCurrenciesLiveData.observe(viewLifecycleOwner) {
-            adapterRV.setData(it)
-            if (adapterRV.itemCount == 0)
+        viewModel.favouriteCurrenciesStateFlow.filterNotNull().collectWithLifecycle(viewLifecycleOwner) {
+            adapterRV.submitList(it)
+            if (it.isEmpty())
                 binding.thereIsNoFavouritesTextView.visibility = View.VISIBLE
             else
                 binding.thereIsNoFavouritesTextView.visibility = View.GONE
@@ -62,11 +71,11 @@ class FavouritesFragment : Fragment() {
     private fun swipeRefreshLayoutInit() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.getFavouriteCurrencies()
-            viewModel.favouriteCurrenciesLiveData.value?.let {
-                adapterRV.setData(it)
-            }
             binding.swipeRefreshLayout.isRefreshing = false
-            adapterRV.notifyDataSetChanged()
         }
+    }
+
+    override fun favouriteOnClickListener(item: ExchangeRatesModel) {
+        viewModel.insertCurrencyIntoDb(item)
     }
 }

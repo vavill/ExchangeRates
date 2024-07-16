@@ -3,21 +3,21 @@ package com.vavill.exchangerates.data.source
 import android.graphics.Bitmap
 import com.vavill.exchangerates.data.db.dao.ExchangeRatesDao
 import com.vavill.exchangerates.data.db.entities.ExchangeRatesEntity
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface ExchangeRatesDbDataSource {
-    suspend fun getAllCurrenciesFromDb(): List<ExchangeRatesEntity>
+    fun getAllCurrenciesFromDb(): Flow<List<ExchangeRatesEntity>>
     suspend fun insertCurrencyIntoDb(entity: ExchangeRatesEntity)
     suspend fun deleteCurrencyFromDb(currencyName: String)
     suspend fun getFavouriteCurrenciesFromDb(): List<ExchangeRatesEntity>
-    suspend fun setCurrencyImageIntoDb(currencyName: String, image: ByteArray)
 }
 
 class ExchangeRatesDbDataSourceImpl @Inject constructor(
     private val dao: ExchangeRatesDao
 ) : ExchangeRatesDbDataSource {
 
-    override suspend fun getAllCurrenciesFromDb(): List<ExchangeRatesEntity> =
+    override fun getAllCurrenciesFromDb(): Flow<List<ExchangeRatesEntity>> =
         dao.getAllCurrencies()
 
     override suspend fun insertCurrencyIntoDb(entity: ExchangeRatesEntity) =
@@ -28,8 +28,4 @@ class ExchangeRatesDbDataSourceImpl @Inject constructor(
 
     override suspend fun getFavouriteCurrenciesFromDb(): List<ExchangeRatesEntity> =
         dao.getFavouriteCurrencies()
-
-    override suspend fun setCurrencyImageIntoDb(currencyName: String, image: ByteArray) {
-        dao.setCurrencyImage(currencyName, image)
-    }
 }

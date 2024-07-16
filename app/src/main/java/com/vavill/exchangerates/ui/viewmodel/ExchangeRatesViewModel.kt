@@ -2,57 +2,70 @@ package com.vavill.exchangerates.ui.viewmodel
 
 import android.content.Context
 import android.util.Log
-import android.widget.ImageView
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.ImageLoader
-import coil.load
-import coil.size.Scale
-import coil.transform.CircleCropTransformation
-import com.vavill.exchangerates.R
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.vavill.exchangerates.domain.interactor.ExchangeRatesInteractor
 import com.vavill.exchangerates.domain.model.ExchangeRatesModel
 import com.vavill.exchangerates.ui.fragment.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 @HiltViewModel
 class ExchangeRatesViewModel @Inject constructor(
-    private val interactor: ExchangeRatesInteractor
+    private val interactor: ExchangeRatesInteractor,
 ) : ViewModel() {
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "baseCurrency")
     private val DATASTORE_KEY = stringPreferencesKey("BaseCurrency")
 
-    private val _exchangeRatesLiveData = MutableLiveData<List<ExchangeRatesModel>>()
-    val exchangeRatesLiveData: LiveData<List<ExchangeRatesModel>> get() = _exchangeRatesLiveData
+    private val _exchangeRatesStateFlow = MutableStateFlow<List<ExchangeRatesModel>?>(null)
+    val exchangeRatesStateFlow: StateFlow<List<ExchangeRatesModel>?> get() = _exchangeRatesStateFlow.asStateFlow()
 
-    private val _currentSortTypeLiveData = MutableLiveData(SortType.ALPHA_ASC)
-    val currentSortTypeLiveData: LiveData<SortType> get() = _currentSortTypeLiveData
+    private val _currentSortTypeStateFlow = MutableStateFlow(SortType.ALPHA_DESC)
+    val currentSortTypeStateFlow: StateFlow<SortType> get() = _currentSortTypeStateFlow
 
-    private val _querySearchLiveData = MutableLiveData<String>()
-    val querySearchLiveData: LiveData<String> get() = _querySearchLiveData
+    private val _filteredSearchDataStateFlow = MutableStateFlow<List<ExchangeRatesModel>?>(null)
+    val filteredSearchDataStateFlow: StateFlow<List<ExchangeRatesModel>?> get() = _filteredSearchDataStateFlow.asStateFlow()
 
-    private val _favouriteCurrenciesLiveData = MutableLiveData<List<ExchangeRatesModel>>()
-    val favouriteCurrenciesLiveData: LiveData<List<ExchangeRatesModel>> get() = _favouriteCurrenciesLiveData
+    private val _favouriteCurrenciesStateFlow = MutableStateFlow<List<ExchangeRatesModel>?>(null)
+    val favouriteCurrenciesStateFlow: StateFlow<List<ExchangeRatesModel>?>
+        get() = _favouriteCurrenciesStateFlow.asStateFlow()
 
-    private val _baseCurrencyLiveData = MutableLiveData<String>()
-    val baseCurrencyLiveData: LiveData<String> get() = _baseCurrencyLiveData
+    private val _baseCurrencyStateFlow = MutableStateFlow<String?>(null)
+    val baseCurrencyStateFlow: StateFlow<String?> get() = _baseCurrencyStateFlow.asStateFlow()
 
     fun loadExchangeRatesFromApi() {
         viewModelScope.launch {
-            _exchangeRatesLiveData.value =
-                interactor.getExchangeRatesFromRepository(baseCurrencyLiveData.value!!)
+            Log.d("myTag", "loadExchangeRatesFromApi")
+            interactor.getExchangeRatesFromRepository(baseCurrencyStateFlow.value!!)
+                .onEach {
+                    Log.d("myTag", "loadExchangeRatesFromApi: ${it.size}")
+                    if (_exchangeRatesStateFlow.value == it)
+                        Log.d("myTag", "_exchangeRatesStateFlow.value == it")
+                    _exchangeRatesStateFlow.value = it
+                }
+                .catch {
+                    Log.d("myTag", "catch ${it.stackTraceToString()}")
+                }
+                .flowOn(Dispatchers.IO)
+                .launchIn(viewModelScope)
         }
     }
 
@@ -68,57 +81,50 @@ class ExchangeRatesViewModel @Inject constructor(
     }
 
     fun setBaseCurrency(baseCurrency: String) {
-        _baseCurrencyLiveData.value = baseCurrency
+        _baseCurrencyStateFlow.value = baseCurrency
     }
 
     fun getFavouriteCurrencies() {
-        viewModelScope.launch {
-            _favouriteCurrenciesLiveData.value = interactor.getFavouriteCurrenciesFromRepository()
-        }
+        flow {
+            emit(interactor.getFavouriteCurrenciesFromRepository())
+        }.onEach {
+            _favouriteCurrenciesStateFlow.value = it
+        }.flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
     }
 
-    fun getAllCurrenciesFromDb() {
-        viewModelScope.launch {
-            _exchangeRatesLiveData.value = interactor.getAllCurrenciesFromRepository()
-        }
-    }
+//    private fun getAllCurrenciesFromDb() {
+//        viewModelScope.launch {
+//            _exchangeRatesStateFlow.value = interactor.getAllCurrenciesFromRepository()
+//        }
+//    }
 
     fun insertCurrencyIntoDb(model: ExchangeRatesModel) {
-        viewModelScope.launch {
-            interactor.insertCurrencyIntoRepository(model)
+        flow {
+            emit(interactor.insertCurrencyIntoRepository(model))
         }
+            .onEach {
+              //  getAllCurrenciesFromDb()
+                getFavouriteCurrencies()
+            }
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
     }
 
     fun setCurrentSortType(sortType: SortType) {
-        _currentSortTypeLiveData.value = sortType
+        _currentSortTypeStateFlow.value = sortType
     }
 
-    fun setFilterSearch(filterString: String) {
-        _querySearchLiveData.value = filterString
-    }
-
-    fun setCurrencyImage(currencyName: String, imageView: ImageView, imageLoader: ImageLoader) {
+    fun setFilterSearch(filter: String) {
         viewModelScope.launch {
-
-            val url = "https://raw.githubusercontent.com/Lissy93/" +
-                    "currency-flags/master/assets/flags_svg/$currencyName.svg"
-
-//            val url = "https://i.pinimg.com/736x/c7/95/56/c7955627ba471fda2aa800cea350e58e.jpg"
-
-            try {
-                withTimeout(5000L) {
-                    imageView.load(url, imageLoader) {
-                        placeholder(R.drawable.ic_launcher_background)
-                        error(R.drawable.ic_favourite_true)
-                        scale(Scale.FIT)
-                        transformations(CircleCropTransformation())
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("ImageLoadError", "Error loading image: ${e.message}")
-            }
-
-//            interactor.setCurrencyImageIntoRepository(currencyName, imageView.drawable.toBitmap())
+            _filteredSearchDataStateFlow.value = getFilteredSearchData(filter)
         }
     }
+
+    private suspend fun getFilteredSearchData(
+        filter: String
+    ): List<ExchangeRatesModel> =
+        interactor.filterSearchData(filter)
+        .flowOn(Dispatchers.IO)
+            .first()
 }

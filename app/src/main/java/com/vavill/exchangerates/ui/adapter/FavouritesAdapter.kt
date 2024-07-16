@@ -1,26 +1,18 @@
 package com.vavill.exchangerates.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.vavill.exchangerates.R
 import com.vavill.exchangerates.databinding.ItemCurrencyBinding
 import com.vavill.exchangerates.domain.model.ExchangeRatesModel
-import com.vavill.exchangerates.ui.viewmodel.ExchangeRatesViewModel
+import com.vavill.exchangerates.ui.adapter.CurrenciesAdapter.ExchangeRatesDiffCallback
 import java.util.Locale
 
 class FavouritesAdapter(
-    private val viewModel: ExchangeRatesViewModel,
-) : RecyclerView.Adapter<FavouritesAdapter.FavouritesViewHolder>() {
-
-    private var favouritesList = listOf<ExchangeRatesModel>()
-
-    fun setData(list: List<ExchangeRatesModel>) {
-        favouritesList = list
-        notifyDataSetChanged()
-    }
+    private val onClickListener: OnClickListenerFavourites
+) : ListAdapter<ExchangeRatesModel, FavouritesAdapter.FavouritesViewHolder>(ExchangeRatesDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesViewHolder {
         return FavouritesViewHolder(
@@ -37,10 +29,10 @@ class FavouritesAdapter(
             holder.view.context,
             R.anim.anim_recycler_view_items
         )
-        holder.bind(favouritesList[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount(): Int = favouritesList.size
+    override fun getItemCount(): Int = currentList.size
 
     inner class FavouritesViewHolder(
         private val binding: ItemCurrencyBinding
@@ -60,22 +52,19 @@ class FavouritesAdapter(
                 false -> binding.currencyFavouriteImageView.setImageResource(R.drawable.ic_favourite_false)
             }
 
-//            viewModel.setCurrencyImage(
-//                item.currencyName,
-//                binding.flagImageView,
-//                getImageLoader.loadImageFromUrl()
-//            )
-
             setFavouriteOnClickListener(item)
         }
 
         private fun setFavouriteOnClickListener(item: ExchangeRatesModel) {
             binding.currencyFavouriteImageView.setOnClickListener {
                 item.isFavourite = !item.isFavourite
-                viewModel.insertCurrencyIntoDb(item)
-                viewModel.getAllCurrenciesFromDb()
-                notifyItemChanged(favouritesList.indexOf(item))
+                onClickListener.favouriteOnClickListener(item)
+                notifyItemChanged(currentList.indexOf(item))
             }
         }
     }
+}
+
+interface OnClickListenerFavourites {
+    fun favouriteOnClickListener(item: ExchangeRatesModel)
 }

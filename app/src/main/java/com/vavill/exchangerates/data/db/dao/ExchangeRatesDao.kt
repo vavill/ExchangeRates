@@ -6,12 +6,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.vavill.exchangerates.data.db.entities.ExchangeRatesEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExchangeRatesDao {
 
     @Query("SELECT * FROM Currencies ")
-    suspend fun getAllCurrencies(): List<ExchangeRatesEntity>
+    fun getAllCurrencies(): Flow<List<ExchangeRatesEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = ExchangeRatesEntity::class)
     suspend fun insertCurrency(entity: ExchangeRatesEntity)
@@ -21,7 +22,4 @@ interface ExchangeRatesDao {
 
     @Query("SELECT * FROM Currencies WHERE isFavourite = 1")
     suspend fun getFavouriteCurrencies(): List<ExchangeRatesEntity>
-
-    @Query("UPDATE Currencies SET currencyImage = :image WHERE currencyName = :currencyName")
-    suspend fun setCurrencyImage(currencyName: String, image: ByteArray)
 }

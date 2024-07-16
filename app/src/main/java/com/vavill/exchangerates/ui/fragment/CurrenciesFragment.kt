@@ -1,22 +1,25 @@
 package com.vavill.exchangerates.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import coil.ImageLoader
-import coil.decode.SvgDecoder
+import com.vavill.exchangerates.collectWithLifecycle
 import com.vavill.exchangerates.databinding.FragmentCurrenciesBinding
+import com.vavill.exchangerates.domain.model.ExchangeRatesModel
 import com.vavill.exchangerates.ui.adapter.CurrenciesAdapter
-import com.vavill.exchangerates.ui.adapter.GetImageLoader
+import com.vavill.exchangerates.ui.adapter.OnClickListenerCurrencies
 import com.vavill.exchangerates.ui.viewmodel.ExchangeRatesViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
 
 @AndroidEntryPoint
-class CurrenciesFragment : Fragment(), GetImageLoader {
+class CurrenciesFragment : Fragment(), OnClickListenerCurrencies {
 
     companion object {
         fun newInstance() = CurrenciesFragment()
@@ -49,19 +52,27 @@ class CurrenciesFragment : Fragment(), GetImageLoader {
     }
 
     private fun init() {
-        adapterRV = CurrenciesAdapter(this, viewModel)
+        adapterRV = CurrenciesAdapter(this)
         binding.currencyRecyclerView.adapter = adapterRV
 
-        viewModel.exchangeRatesLiveData.observe(viewLifecycleOwner) {
-            adapterRV.setData(it)
+        viewModel.exchangeRatesStateFlow.filterNotNull().collectWithLifecycle(viewLifecycleOwner) {
+            Log.d("myTag", "curr fragment start collect")
+            adapterRV.submitList(it)
+     //       adapterRV.sortData(viewModel.currentSortTypeStateFlow.value)
+            Log.d("myTag", "curr has been collected")
         }
 
-        viewModel.currentSortTypeLiveData.observe(viewLifecycleOwner) {
+        viewModel.currentSortTypeStateFlow.filterNotNull().collectWithLifecycle(viewLifecycleOwner) {
             adapterRV.sortData(it)
+            binding.currencyRecyclerView.layoutManager!!.smoothScrollToPosition(
+                binding.currencyRecyclerView,
+                RecyclerView.State(),
+                0
+            )
         }
 
-        viewModel.querySearchLiveData.observe(viewLifecycleOwner) {
-            adapterRV.filterData(it)
+        viewModel.filteredSearchDataStateFlow.filterNotNull().collectWithLifecycle(viewLifecycleOwner) {
+            adapterRV.submitList(it)
         }
 
         swipeRefreshLayoutInit()
@@ -78,16 +89,15 @@ class CurrenciesFragment : Fragment(), GetImageLoader {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.loadExchangeRatesFromApi()
             binding.swipeRefreshLayout.isRefreshing = false
-            adapterRV.notifyDataSetChanged()
         }
     }
 
-    override fun loadImageFromUrl(): ImageLoader {
-        val imageLoader = ImageLoader.Builder(requireContext()).components {
-            add(SvgDecoder.Factory())
-        }.build()
-        return imageLoader
-        //viewModel.setCurrencyImage(currencyName, imageView, imageLoader)
+    override fun favouriteOnClickListener(item: ExchangeRatesModel) {
+        viewModel.insertCurrencyIntoDb(item)
+    }
+
+    override fun itemOnClickListener(item: ExchangeRatesModel) {
+        viewModel.setBaseCurrency(item.currencyName)
     }
 }
 

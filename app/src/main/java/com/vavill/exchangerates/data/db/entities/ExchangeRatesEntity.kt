@@ -19,8 +19,5 @@ data class ExchangeRatesEntity(
     val rate: Double,
 
     @ColumnInfo(name = "isFavourite")
-    val isFavourite: Boolean,
-
-    @ColumnInfo(name = "currencyImage")
-    val image: ByteArray?
+    val isFavourite: Boolean
 )

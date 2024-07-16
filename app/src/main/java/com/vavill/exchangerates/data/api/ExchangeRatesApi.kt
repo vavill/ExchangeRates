@@ -19,8 +19,8 @@ interface ExchangeRatesApi {
     ): SymbolsDTO
 
     companion object {
-        private const val API_KEY = "u8UxQbS98BOJA8AxTdYg15d0Jk4MroOg"
-        // J0IYLbNf87VLRqCTOyVlvn1DmNb1c382
+        private const val API_KEY = "J0IYLbNf87VLRqCTOyVlvn1DmNb1c382"
+        // u8UxQbS98BOJA8AxTdYg15d0Jk4MroOg
         // Zt1vBM2daYF6HOjZz15Y818C0Qn4s7og
         // krgPW5BCaXSX8Yfn2Ldp3UKLeHlb6Fnu
         // w0IFxB35WCc2tjgyWTaE1HFyFR6qC8Zr

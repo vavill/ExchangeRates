@@ -3,55 +3,27 @@ package com.vavill.exchangerates.ui.adapter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.ImageLoader
 import com.vavill.exchangerates.R
 import com.vavill.exchangerates.databinding.ItemCurrencyBinding
 import com.vavill.exchangerates.domain.model.ExchangeRatesModel
-import com.vavill.exchangerates.ui.fragment.CurrenciesFragment
-import com.vavill.exchangerates.ui.fragment.ExchangeRatesFragment
 import com.vavill.exchangerates.ui.fragment.SortType
-import com.vavill.exchangerates.ui.viewmodel.ExchangeRatesViewModel
 import java.util.Locale
 
 class CurrenciesAdapter(
-    private val getImageLoader: GetImageLoader,
-    private val viewModel: ExchangeRatesViewModel,
-) : RecyclerView.Adapter<CurrenciesAdapter.ExchangeRatesViewHolder>() {
-
-    private var currenciesList = listOf<ExchangeRatesModel>()
-
-    fun setData(list: List<ExchangeRatesModel>) {
-        currenciesList = list
-        sortData(SortType.ALPHA_ASC)
-        notifyDataSetChanged()
-    }
+    private val onClickListenerCurrencies: OnClickListenerCurrencies
+) : ListAdapter<ExchangeRatesModel, CurrenciesAdapter.ExchangeRatesViewHolder>(ExchangeRatesDiffCallback()) {
 
     fun sortData(sortType: SortType) {
-        currenciesList = when (sortType) {
-            SortType.ALPHA_ASC -> currenciesList.sortedBy { it.currencyName }
-            SortType.ALPHA_DESC -> currenciesList.sortedByDescending { it.currencyName }
-            SortType.NUMERIC_ASC -> currenciesList.sortedBy { it.currencyValue }
-            SortType.NUMERIC_DESC -> currenciesList.sortedByDescending { it.currencyValue }
-        }
-        notifyDataSetChanged()
-    }
-
-    fun filterData(filter: String) {
-        if (filter.isBlank())
-            setData(viewModel.exchangeRatesLiveData.value!!)
-        else {
-            val filteredList = viewModel.exchangeRatesLiveData.value!!.filter {
-                it.currencyName.contains(filter, true)
-                        || it.currencyFullName.contains(filter, true)
-            }
-                .sortedWith(compareBy<ExchangeRatesModel> { it.currencyName }
-                    .thenBy { it.currencyFullName })
-                .reversed()
-
-            setData(filteredList)
-        }
+        Log.d("myTag", "sortData: $sortType")
+        submitList(when (sortType) {
+            SortType.ALPHA_ASC -> currentList.sortedBy { it.currencyName }
+            SortType.ALPHA_DESC -> currentList.sortedByDescending { it.currencyName }
+            SortType.NUMERIC_ASC -> currentList.sortedBy { it.currencyValue }
+            SortType.NUMERIC_DESC -> currentList.sortedByDescending { it.currencyValue }
+        })
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExchangeRatesViewHolder =
@@ -68,10 +40,10 @@ class CurrenciesAdapter(
             holder.view.context,
             R.anim.anim_recycler_view_items
         )
-        holder.bind(currenciesList[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount(): Int = currenciesList.size
+    override fun getItemCount(): Int = currentList.size
 
     inner class ExchangeRatesViewHolder(
         private val binding: ItemCurrencyBinding
@@ -92,34 +64,43 @@ class CurrenciesAdapter(
                 false -> binding.currencyFavouriteImageView.setImageResource(R.drawable.ic_favourite_false)
             }
 
-//            viewModel.setCurrencyImage(
-//                item.currencyName,
-//                binding.flagImageView,
-//                getImageLoader.loadImageFromUrl()
-//            )
             setItemOnClickListener(item)
             setFavouriteOnClickListener(item)
         }
 
         private fun setItemOnClickListener(item: ExchangeRatesModel) {
             binding.root.setOnClickListener {
-                viewModel.setBaseCurrency(item.currencyName)
-                viewModel.loadExchangeRatesFromApi()
-                notifyDataSetChanged()
+                onClickListenerCurrencies.itemOnClickListener(item)
             }
         }
 
         private fun setFavouriteOnClickListener(item: ExchangeRatesModel) {
             binding.currencyFavouriteImageView.setOnClickListener {
                 item.isFavourite = !item.isFavourite
-                viewModel.insertCurrencyIntoDb(item)
-                viewModel.getFavouriteCurrencies()
-                notifyItemChanged(currenciesList.indexOf(item))
+                onClickListenerCurrencies.favouriteOnClickListener(item)
+                notifyItemChanged(currentList.indexOf(item))
             }
         }
     }
+
+    class ExchangeRatesDiffCallback: DiffUtil.ItemCallback<ExchangeRatesModel>() {
+        override fun areItemsTheSame(
+            oldItem: ExchangeRatesModel,
+            newItem: ExchangeRatesModel
+        ) = oldItem == newItem
+
+        override fun areContentsTheSame(
+            oldItem: ExchangeRatesModel,
+            newItem: ExchangeRatesModel
+        ): Boolean =
+            oldItem.currencyName == newItem.currencyName &&
+            oldItem.currencyFullName == newItem.currencyFullName &&
+            oldItem.currencyValue == newItem.currencyValue &&
+            oldItem.isFavourite == newItem.isFavourite
+    }
 }
 
-interface GetImageLoader {
-    fun loadImageFromUrl(): ImageLoader
+interface OnClickListenerCurrencies {
+    fun favouriteOnClickListener(item: ExchangeRatesModel)
+    fun itemOnClickListener(item: ExchangeRatesModel)
 }

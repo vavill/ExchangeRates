@@ -16,10 +16,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.vavill.exchangerates.R
+import com.vavill.exchangerates.collectWithLifecycle
 import com.vavill.exchangerates.databinding.FragmentExchangeRatesBinding
 import com.vavill.exchangerates.ui.adapter.ViewPagerAdapter
 import com.vavill.exchangerates.ui.viewmodel.ExchangeRatesViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -57,14 +59,14 @@ class ExchangeRatesFragment : Fragment() {
             viewModel.getBaseCurrencyFromDataStore(requireContext())
         }
 
-        currentSortType = viewModel.currentSortTypeLiveData.value!!
+        currentSortType = viewModel.currentSortTypeStateFlow.value
 
-        viewModel.baseCurrencyLiveData.observe(viewLifecycleOwner) {
+        viewModel.baseCurrencyStateFlow.filterNotNull().collectWithLifecycle(viewLifecycleOwner) {
             viewModel.loadExchangeRatesFromApi()
         }
 
-        viewModel.exchangeRatesLiveData.observe(viewLifecycleOwner) {
-            setBaseCurrencyUI(viewModel.baseCurrencyLiveData.value!!)
+        viewModel.exchangeRatesStateFlow.filterNotNull().collectWithLifecycle(viewLifecycleOwner) {
+            setBaseCurrencyUI(viewModel.baseCurrencyStateFlow.value!!)
             viewModel.getFavouriteCurrencies()
         }
 
@@ -236,13 +238,12 @@ class ExchangeRatesFragment : Fragment() {
     }
 
     private fun setBaseCurrencyUI(baseCurrency: String) {
-        if (!viewModel.exchangeRatesLiveData.value.isNullOrEmpty()) {
+        if (!viewModel.exchangeRatesStateFlow.value.isNullOrEmpty()) {
             val baseCurrencyModel =
-                viewModel.exchangeRatesLiveData.value!!.find { it.currencyName == baseCurrency }
+                viewModel.exchangeRatesStateFlow.value!!.find { it.currencyName == baseCurrency }
 
             binding.currentCurrencyNameTextView.text = baseCurrencyModel!!.currencyName
             binding.currentCurrencyFullNameTextView.text = baseCurrencyModel.currencyFullName
-            binding.currentCurrencyImageImageView.setImageBitmap(baseCurrencyModel.image)
 
             lifecycleScope.launch {
                 viewModel.saveBaseCurrencyToDataStore(requireContext(), baseCurrency)

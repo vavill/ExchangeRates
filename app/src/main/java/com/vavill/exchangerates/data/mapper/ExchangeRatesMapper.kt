@@ -3,7 +3,6 @@ package com.vavill.exchangerates.data.mapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.vavill.exchangerates.data.db.entities.ExchangeRatesEntity
-import com.vavill.exchangerates.data.dto.RatesDTO
 import com.vavill.exchangerates.data.dto.SymbolsDTO
 import com.vavill.exchangerates.domain.model.ExchangeRatesModel
 import java.io.ByteArrayOutputStream
@@ -22,7 +21,6 @@ class ExchangeRatesMapper {
             model.currencyFullName,
             model.currencyValue,
             model.isFavourite,
-            bitmapToByteArray(model.image)
         )
     }
 
@@ -32,7 +30,6 @@ class ExchangeRatesMapper {
             entity.rate,
             entity.fullName,
             entity.isFavourite,
-            byteArrayToBitmap(entity.image),
         )
     }
 
@@ -46,25 +43,11 @@ class ExchangeRatesMapper {
                 ExchangeRatesModel(
                     name,
                     value,
-                    fullNames.getValue(name),
+                    fullNames[name] ?: "dv",
                     false,
-                    image = null
                 )
             )
         }
         return list
-    }
-
-    fun bitmapToByteArray(bitmap: Bitmap?): ByteArray {
-        val stream = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.PNG, 100, stream)
-        return stream.toByteArray()
-    }
-
-    fun byteArrayToBitmap(byteArray: ByteArray?): Bitmap? {
-        return byteArray?.let {
-            BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-        }
-
     }
 }
