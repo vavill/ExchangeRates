@@ -25,4 +25,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Exchange rates"
 include(":app")
- 
+include(":data")
+include(":domain")
+include(":ui")
+include(":ui:xml")
+include(":ui:compose")
+include(":ui:common")

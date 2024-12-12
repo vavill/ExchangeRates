@@ -19,6 +19,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    hilt {
+        enableExperimentalClasspathAggregation = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,17 +40,26 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        viewBinding = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
 }
 
 dependencies {
+    implementation(project(":data"))
+    implementation(project(":domain"))
+    implementation(project(":ui:xml"))
+    implementation(project(":ui:compose"))
+    implementation(project(":ui:common"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.activity.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,27 +69,15 @@ dependencies {
 
     // di
     implementation(libs.hilt.android)
+//    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
-
-    // retrofit
-    implementation(libs.retrofit2.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.logging.interceptor)
-
-    // room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
 
     //coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
 
-    //reflection
-    implementation(kotlin("reflect"))
-
     //image loading
-    implementation(libs.glide)
+//    implementation(libs.glide)
     implementation(libs.coil)
     implementation(libs.coil.svg)
 
@@ -86,5 +87,6 @@ dependencies {
     // datastore
     implementation(libs.androidx.datastore.preferences)
 
+//    implementation(libs.kotlin.stdlib.jdk7)
 
 }
